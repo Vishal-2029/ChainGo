@@ -83,38 +83,37 @@ Unlike most tutorials that just explain blockchain theory, ChainGo is **fully in
 ```
 chaingo/
 │
-├── backend/                    # Go Backend
+├── backend/                   # Go Backend
 │   ├── main.go                # Application entry point
 │   │
-│   ├── blockchain/            # Core blockchain package
+│   ├── blockchain/           # Core blockchain package
 │   │   ├── block.go          # Block structure, hashing, serialization
 │   │   ├── blockchain.go     # Blockchain logic, chain management
 │   │   ├── pow.go            # Proof of Work mining implementation
 │   │   ├── transaction.go    # Transaction creation and validation
 │   │   └── wallet.go         # ECDSA wallet and key management
 │   │
-│   ├── api/                   # REST API layer
-│   │   ├── server.go         # HTTP server setup
-│   │   ├── handlers.go       # API endpoint handlers
-│   │   └── middleware.go     # CORS, logging, auth
+│   ├── internal/             # REST API layer
+│   │   ├── server.go         # Fiber app setup, route registration
+│   │   ├── handlers.go       # Endpoint logic (uses blockchain package)
 │   │
-│   ├── network/               # P2P networking (optional)
+│   ├── network/              # P2P networking (optional)
 │   │   ├── node.go           # Node implementation
 │   │   ├── peer.go           # Peer management
 │   │   └── protocol.go       # Network protocol
 │   │
-│   ├── storage/               # Data persistence
+│   ├── pkg/                  # Data persistence
 │   │   ├── db.go             # Database interface
 │   │   └── bolt.go           # BoltDB implementation
 │   │
-│   ├── utils/                 # Utility functions
+│   ├── utils/                # Utility functions
 │   │   ├── crypto.go         # Cryptographic helpers
 │   │   └── logger.go         # Logging utilities
 │   │
 │   └── config/                # Configuration
 │       └── config.go         # App configuration
 │
-├── frontend/                   # Vue.js Frontend
+├── frontend/                  # Vue.js Frontend
 │   ├── public/                # Static assets
 │   ├── src/
 │   │   ├── assets/           # Images, styles

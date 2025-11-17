@@ -1,26 +1,81 @@
 package blockchain
 
-// Represents a blockchain data structure, comprising a linked list of blocks.
-// Blockchain is a sequence of blocks
-type blockchain struct {
+import (
+	"bytes"
+	"fmt"
+	"log"
+
+	"github.com/Vishal-2029/pkg"
+	"go.etcd.io/bbolt"
+)
+
+type Blockchain struct {
 	Block []*Block
+	DB    *pkg.BoltDB
 }
 
-// NewBlockchain creates a blockchain with the genesis block
-func NewBlockchain() *blockchain {
-	return &blockchain{
-		Block: []*Block{createGenesisBlock()},
+func NewBlockchain(db *pkg.BoltDB) *Blockchain {
+	bc := &Blockchain{DB: db}
+	
+	// Try to load existing chain first
+	err := bc.LoadChain()
+	if err != nil {
+		log.Println("No existing chain found, creating genesis block...")
+		genesis := NewBlock([]string{"Genesis Block"}, []byte{})
+		bc.Block = append(bc.Block, genesis)
+
+		if err := bc.SaveBlock(genesis); err != nil {
+			log.Println("Error saving genesis block:", err)
+		}
+	} else {
+		log.Printf("Loaded existing chain with %d blocks\n", len(bc.Block))
+	}
+	
+	return bc
+}
+
+func (bc *Blockchain) AddBlock(transactions []string) {
+	prevBlock := bc.Block[len(bc.Block)-1]
+	newBlock := NewBlock(transactions, prevBlock.Hash)
+	bc.Block = append(bc.Block, newBlock)
+	if err := bc.SaveBlock(newBlock); err != nil {
+		log.Println("Error saving block:", err)
 	}
 }
 
-// createGenesisBlock makes the very first block
-func createGenesisBlock() *Block {
-	return NewBlock([]string{"Genesis Block"}, []byte{})
+func (bc *Blockchain) SaveBlock(block *Block) error {
+	data := block.Serialize()
+	return bc.DB.SaveWallet(string(block.Hash), data)
 }
 
-// AddBlock appends a new block to the chain
-func (blc *blockchain) AddBlock(transactions []string) {
-	PrevHash := blc.Block[len(blc.Block)-1]
-	newblock := NewBlock(transactions, PrevHash.Hash)
-	blc.Block = append(blc.Block, newblock)
+func (bc *Blockchain) LoadChain() error {
+	return bc.DB.DB.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket([]byte("chaingo_blocks"))
+		if b == nil {
+			return fmt.Errorf("bucket not found")
+		}
+		
+		return b.ForEach(func(k, v []byte) error {
+			block := Deserialize(v)
+			bc.Block = append(bc.Block, block)
+			return nil
+		})
+	})
+}
+
+func (bc *Blockchain) Validate() error {
+	for i := 1; i < len(bc.Block); i++ {
+		prev := bc.Block[i-1]
+		curr := bc.Block[i]
+
+		if !bytes.Equal(curr.PrevHash, prev.Hash) {
+			return fmt.Errorf("block %d previous hash mismatch", i)
+		}
+
+		pow := NewProofOfWork(curr)
+		if !pow.Validate() {
+			return fmt.Errorf("block %d proof of work invalid", i)
+		}
+	}
+	return nil
 }
