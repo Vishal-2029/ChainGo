@@ -65,19 +65,19 @@ ChainGo/
 ├── chaingo_backend         # Compiled executable
 ├── chaingo.db              # BoltDB database file
 ├── verify_chain.sh         # Automated test script
-├── API_GUIDE.txt           # Complete API documentation
-├── PROJECT_EXPLAINED.txt   # Detailed project explanation
+├── API_GUIDE.md            # Complete API documentation
+├── PROJECT_EXPLAINED.md    # Detailed project explanation
 │
 ├── blockchain/             # Core blockchain package
-│   ├── block.go            # Block structure, hashing, serialization
-│   ├── blockchain.go       # Blockchain logic, chain management
-│   ├── pow.go              # Proof of Work mining implementation
-│   ├── transaction.go      # Transaction creation and validation
-│   ├── wallet.go           # ECDSA wallet and key management
+│   ├── block.go            # Block structure, serialization
+│   ├── blockchain.go       # Chain management, validation
+│   ├── pow.go              # Proof of Work algorithm
+│   ├── transaction.go      # Transaction structure, signing
+│   ├── wallet.go           # ECDSA wallet, key generation
 │   └── utils.go            # Helper functions
 │
 ├── internal/               # REST API layer
-│   ├── server.go           # Fiber app setup, route registration
+│   ├── server.go           # Fiber HTTP server setup
 │   └── handlers.go         # Endpoint logic (16 API handlers)
 │
 ├── network/                # P2P networking
