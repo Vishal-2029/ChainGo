@@ -96,16 +96,12 @@ func GetWalletBalanceHandler(c *fiber.Ctx) error {
 	// Calculate balance by scanning all transactions in the blockchain
 	balance := 0
 	for _, block := range chain.Block {
-		for _, txString := range block.Transactions {
-			// Parse transaction string (format: "from->to:amount")
-			// This is a simplified balance calculation
-			// In a real implementation, you'd parse the actual transaction objects
-			if len(txString) > 0 {
-				// Simple logic: if address is receiver, add amount; if sender, subtract
-				// This is placeholder logic - you'd need proper transaction parsing
-				if txString[len(txString)-3:] == address[len(address)-3:] {
-					balance += 10 // placeholder amount
-				}
+		for _, tx := range block.Transactions {
+			if tx.To == address {
+				balance += tx.Amount
+			}
+			if tx.From == address {
+				balance -= tx.Amount
 			}
 		}
 	}
@@ -222,13 +218,13 @@ func GetTransactionHandler(c *fiber.Ctx) error {
 
 	// Search for transaction in blockchain
 	for _, block := range chain.Block {
-		for _, txString := range block.Transactions {
-			txHash := fmt.Sprintf("%x", (&blockchain.Transaction{From: txString}).Hash())
+		for _, tx := range block.Transactions {
+			txHash := fmt.Sprintf("%x", tx.Hash())
 			if txHash == hash {
 				return c.JSON(fiber.Map{
 					"hash":  hash,
-					"block": block.Hash,
-					"data":  txString,
+					"block": fmt.Sprintf("%x", block.Hash),
+					"data":  tx,
 				})
 			}
 		}
@@ -330,19 +326,33 @@ func MineHandler(c *fiber.Ctx) error {
 	mu.Lock()
 	defer mu.Unlock()
 
-	if len(pendingTx) == 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "No pending transactions to mine",
-		})
+	var body struct {
+		MinerAddress string `json:"minerAddress"`
+	}
+	// Attempt to parse body, but don't fail if empty (for simple GET requests)
+	c.BodyParser(&body)
+
+	// Create a Coinbase transaction (Reward)
+	// If no address provided, burn the reward or send to a default (e.g. Genesis)
+	minerAddr := body.MinerAddress
+	if minerAddr == "" {
+		minerAddr = "Genesis"
 	}
 
-	// Convert transactions to string representation for the block
-	var txStrings []string
-	for _, tx := range pendingTx {
-		txStrings = append(txStrings, formatTransaction(tx))
+	rewardTx := &blockchain.Transaction{
+		From:      "Coinbase",
+		To:        minerAddr,
+		Amount:    50, // Block reward
+		PublicKey: []byte{},
+		R:         "",
+		S:         "",
 	}
 
-	chain.AddBlock(txStrings)
+	// Prepare transactions for the block: Reward + Pending
+	blockTx := []*blockchain.Transaction{rewardTx}
+	blockTx = append(blockTx, pendingTx...)
+
+	chain.AddBlock(blockTx)
 	minedBlock := chain.Block[len(chain.Block)-1]
 
 	// BROADCAST NEW BLOCK TO P2P NETWORK
@@ -358,12 +368,14 @@ func MineHandler(c *fiber.Ctx) error {
 	pendingTx = nil
 
 	return c.JSON(fiber.Map{
-		"message": "Block mined successfully and broadcasted to P2P network",
+		"message": "Block mined successfully",
 		"block": fiber.Map{
 			"index":        len(chain.Block) - 1,
 			"hash":         fmt.Sprintf("%x", minedBlock.Hash),
 			"timestamp":    minedBlock.Timestamp,
 			"transactions": len(minedBlock.Transactions),
+			"reward":       50,
+			"miner":        minerAddr,
 		},
 	})
 }
@@ -427,6 +439,18 @@ func ListPeersHandler(c *fiber.Ctx) error {
 		"count": len(peers),
 		"peers": peers,
 	})
+}
+
+func SyncHandler(c *fiber.Ctx) error {
+	if node != nil {
+		msg := network.Message{
+			Type: "CHAIN_REQUEST",
+			Data: node.Address, // Send our listening address so peer can dial back
+		}
+		node.Broadcast(msg)
+		return c.JSON(fiber.Map{"message": "Sync requested from peers"})
+	}
+	return c.JSON(fiber.Map{"error": "Node not initialized"})
 }
 
 // ========== HELPER FUNCTIONS ==========

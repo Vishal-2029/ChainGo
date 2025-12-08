@@ -3,7 +3,6 @@
 <div align="center">
 
 ![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=for-the-badge&logo=go)
-![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?style=for-the-badge&logo=vue.js)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 
@@ -11,7 +10,7 @@
 
 *Learn blockchain internals through hands-on implementation with Go concurrency, cryptography, and networking*
 
-[Features](#-key-features) • [Getting Started](#️-getting-started) • [API Docs](#-api-endpoints) • [Roadmap](#-roadmap) • [Contributing](#-contributing)
+[Features](#-key-features) • [Getting Started](#️-getting-started) • [API Docs](#-api-endpoints) • [Roadmap](#-roadmap)
 
 </div>
 
@@ -19,16 +18,16 @@
 
 ## 📘 Overview
 
-**ChainGo** is a complete blockchain system implemented from scratch in **Golang**, paired with a modern **Vue.js** frontend for visualization and interaction. It's designed as a **learning-grade blockchain framework** that demonstrates how real blockchains (like Bitcoin or Ethereum) work — while teaching core **Go concepts** such as **concurrency**, **goroutines**, **channels**, and **networking**.
+**ChainGo** is a complete blockchain system implemented from scratch in **Golang**. It's designed as a **learning-grade blockchain framework** that demonstrates how real blockchains (like Bitcoin or Ethereum) work — while teaching core **Go concepts** such as **concurrency**, **goroutines**, **channels**, and **networking**.
 
-Unlike most tutorials that just explain blockchain theory, ChainGo is **fully interactive** — it exposes a REST API layer, wallet management, transaction handling, and concurrent mining using Proof-of-Work (PoW).
+Unlike most tutorials that just explain blockchain theory, ChainGo is **fully functional** — it exposes a REST API layer, wallet management, transaction handling, and concurrent mining using Proof-of-Work (PoW).
 
 ### 🎯 What Makes ChainGo Different?
 
 - ✅ **Production-Ready Patterns**: Real-world Go concurrency patterns
-- ✅ **Interactive UI**: Vue.js dashboard for real-time blockchain visualization
 - ✅ **Complete System**: Not just a blockchain, but wallets, mining, and networking
 - ✅ **Educational**: Extensive comments and documentation throughout the codebase
+- ✅ **P2P Networking**: Multi-node synchronization and blockchain consensus
 
 ---
 
@@ -45,10 +44,6 @@ Unlike most tutorials that just explain blockchain theory, ChainGo is **fully in
 
 ## 🧩 Key Features
 
-<table>
-<tr>
-<td width="50%">
-
 ### Backend (Go)
 - 🧱 **Blockchain Core** - Custom implementation from scratch
 - ⛏️ **Proof-of-Work** - Concurrent mining with goroutines
@@ -56,96 +51,46 @@ Unlike most tutorials that just explain blockchain theory, ChainGo is **fully in
 - 💰 **Transactions** - Signed and verified transactions
 - 🌐 **REST API** - Complete JSON API layer
 - 🧵 **Concurrency** - Advanced goroutine patterns
-- 💾 **Persistence** - BoltDB/LevelDB storage
+- 💾 **Persistence** - BoltDB storage
 - 🔄 **P2P Networking** - Multi-node synchronization
-
-</td>
-<td width="50%">
-
-### Frontend (Vue.js)
-- 📊 **Live Dashboard** - Real-time blockchain visualization
-- 💼 **Wallet Manager** - Create and manage wallets
-- 💸 **Transaction UI** - Send transactions with ease
-- ⛏️ **Mining Console** - Start/stop mining operations
-- 🔍 **Block Explorer** - Detailed block and transaction viewer
-- 📈 **Network Stats** - Node status and peer information
-- 🎨 **Modern UI** - Responsive design with Tailwind CSS
-- ⚡ **Real-time Updates** - WebSocket integration (optional)
-
-</td>
-</tr>
-</table>
 
 ---
 
 ## 📁 Project Structure
 
 ```
-chaingo/
+ChainGo/
 │
-├── backend/                   # Go Backend
-│   ├── main.go                # Application entry point
-│   │
-│   ├── blockchain/           # Core blockchain package
-│   │   ├── block.go          # Block structure, hashing, serialization
-│   │   ├── blockchain.go     # Blockchain logic, chain management
-│   │   ├── pow.go            # Proof of Work mining implementation
-│   │   ├── transaction.go    # Transaction creation and validation
-│   │   └── wallet.go         # ECDSA wallet and key management
-│   │
-│   ├── internal/             # REST API layer
-│   │   ├── server.go         # Fiber app setup, route registration
-│   │   ├── handlers.go       # Endpoint logic (uses blockchain package)
-│   │
-│   ├── network/              # P2P networking (optional)
-│   │   ├── node.go           # Node implementation
-│   │   ├── peer.go           # Peer management
-│   │   └── protocol.go       # Network protocol
-│   │
-│   ├── pkg/                  # Data persistence
-│   │   ├── db.go             # Database interface
-│   │   └── bolt.go           # BoltDB implementation
-│   │
-│   ├── utils/                # Utility functions
-│   │   ├── crypto.go         # Cryptographic helpers
-│   │   └── logger.go         # Logging utilities
-│   │
-│   └── config/                # Configuration
-│       └── config.go         # App configuration
+├── main.go                 # Application entry point
+├── chaingo_backend         # Compiled executable
+├── chaingo.db              # BoltDB database file
+├── verify_chain.sh         # Automated test script
+├── API_GUIDE.txt           # Complete API documentation
+├── PROJECT_EXPLAINED.txt   # Detailed project explanation
 │
-├── frontend/                  # Vue.js Frontend
-│   ├── public/                # Static assets
-│   ├── src/
-│   │   ├── assets/           # Images, styles
-│   │   ├── components/       # Vue components
-│   │   │   ├── Blockchain.vue
-│   │   │   ├── Wallet.vue
-│   │   │   ├── Mining.vue
-│   │   │   ├── Transactions.vue
-│   │   │   └── BlockExplorer.vue
-│   │   │
-│   │   ├── views/            # Page views
-│   │   ├── router/           # Vue Router config
-│   │   ├── store/            # Vuex/Pinia state
-│   │   ├── services/         # API service layer
-│   │   │   └── api.js        # API client
-│   │   ├── App.vue           # Root component
-│   │   └── main.js           # Vue app entry
-│   │
-│   ├── package.json
-│   └── vite.config.js        # Vite configuration
+├── blockchain/             # Core blockchain package
+│   ├── block.go            # Block structure, hashing, serialization
+│   ├── blockchain.go       # Blockchain logic, chain management
+│   ├── pow.go              # Proof of Work mining implementation
+│   ├── transaction.go      # Transaction creation and validation
+│   ├── wallet.go           # ECDSA wallet and key management
+│   └── utils.go            # Helper functions
 │
-├── docs/                      # Documentation
-│   ├── API.md                # API documentation
-│   ├── ARCHITECTURE.md       # System architecture
-│   └── MINING.md             # Mining guide
+├── internal/               # REST API layer
+│   ├── server.go           # Fiber app setup, route registration
+│   └── handlers.go         # Endpoint logic (16 API handlers)
 │
-├── scripts/                   # Utility scripts
-│   └── setup.sh              # Setup script
+├── network/                # P2P networking
+│   ├── node.go             # Node implementation
+│   ├── peer.go             # Peer management
+│   └── protocol.go         # Network protocol
 │
-├── .gitignore
-├── README.md
-└── LICENSE
+├── pkg/                    # Data persistence
+│   └── bolt.go             # BoltDB implementation
+│
+├── go.mod                  # Go module dependencies
+├── go.sum                  # Dependency checksums
+└── README.md               # This file
 ```
 
 ---
@@ -241,7 +186,6 @@ graph LR
 ### Prerequisites
 
 - **Go** 1.21 or higher
-- **Node.js** 18+ and npm/yarn
 - **Git**
 
 ### Installation
@@ -253,47 +197,36 @@ git clone https://github.com/yourusername/chaingo.git
 cd chaingo
 ```
 
-#### 2️⃣ Setup Backend
+#### 2️⃣ Install Dependencies
 
 ```bash
-cd backend
-
-# Install dependencies
 go mod download
-
-# Run the blockchain node
-go run main.go
 ```
 
-The backend server will start on `http://localhost:8080`
-
-#### 3️⃣ Setup Frontend
+#### 3️⃣ Build the Application
 
 ```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
+go build -o chaingo_backend main.go
 ```
 
-The Vue.js frontend will start on `http://localhost:5173`
-
-### 🐳 Docker Setup (Optional)
+#### 4️⃣ Run the Blockchain Node
 
 ```bash
-# Build and run with Docker Compose
-docker-compose up -d
+./chaingo_backend
+```
 
-# View logs
-docker-compose logs -f
+The backend server will start on `http://localhost:8080` (API) and `:9000` (P2P)
+
+You can customize ports:
+```bash
+./chaingo_backend -api 8080 -p2p 9000 -db chaingo.db
 ```
 
 ---
 
 ## 🎮 Usage Examples
+
+For complete API documentation, see [API_GUIDE.md](API_GUIDE.md)
 
 ### Create a Wallet
 
@@ -304,10 +237,21 @@ curl -X POST http://localhost:8080/api/wallet/create
 **Response:**
 ```json
 {
-  "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  "address": "b358327f2d0cdcd524218fd109ef91b175af67caf73009ea4a0bf58ff85dbf0b",
   "publicKey": "04a8b2c3d4e5f6...",
-  "privateKey": "ebc4d5e6f7g8h9..."
+  "privateKey": "ebc4d5e6f7g8h9...",
+  "message": "Wallet created successfully - SAVE YOUR PRIVATE KEY!"
 }
+```
+
+### Mine a Block
+
+```bash
+curl -X POST http://localhost:8080/api/mine \
+  -H "Content-Type: application/json" \
+  -d '{
+    "minerAddress": "b358327f2d0cdcd524218fd109ef91b175af67caf73009ea4a0bf58ff85dbf0b"
+  }'
 ```
 
 ### Create Transaction
@@ -316,27 +260,40 @@ curl -X POST http://localhost:8080/api/wallet/create
 curl -X POST http://localhost:8080/api/transaction/create \
   -H "Content-Type: application/json" \
   -d '{
-    "from": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-    "to": "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2",
-    "amount": 50,
+    "from": "b358327f2d0cdcd524218fd109ef91b175af67caf73009ea4a0bf58ff85dbf0b",
+    "to": "7bd72b6d716277445abaff98bbd77808b110264c958a8bba7ab6997fca01ad2a",
+    "amount": 10,
     "privateKey": "your-private-key"
   }'
 ```
 
-### Start Mining
-
-```bash
-curl -X POST http://localhost:8080/api/mine/start \
-  -H "Content-Type: application/json" \
-  -d '{
-    "minerAddress": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
-  }'
-```
 
 ### View Blockchain
 
 ```bash
-curl http://localhost:8080/api/blockchain
+curl http://localhost:8080/api/chain
+```
+
+### Run Multi-Node Network
+
+**Terminal 1 (Node 1):**
+```bash
+./chaingo_backend -api 8080 -p2p 9000 -db node1.db
+```
+
+**Terminal 2 (Node 2):**
+```bash
+./chaingo_backend -api 8081 -p2p 9001 -db node2.db
+```
+
+**Connect Nodes:**
+```bash
+curl -X POST http://localhost:8081/api/peer/add \
+  -H "Content-Type: application/json" \
+  -d '{"address": ":9000"}'
+
+# Sync blockchain
+curl http://localhost:8081/api/sync
 ```
 
 ---
@@ -365,26 +322,21 @@ curl http://localhost:8080/api/blockchain
 ### ✅ Completed
 
 - [x] Core blockchain structure
-- [x] Proof-of-Work mining
+- [x] Proof-of-Work mining with block rewards
 - [x] ECDSA wallet system
 - [x] Transaction signing & verification
 - [x] REST API implementation
-- [x] Vue.js frontend dashboard
-
-### 🚧 In Progress
-
-- [ ] BoltDB persistence layer
-- [ ] P2P network synchronization
-- [ ] WebSocket real-time updates
+- [x] BoltDB persistence layer
+- [x] P2P network synchronization
+- [x] Multi-node blockchain sync
 
 ### 🔮 Planned
 
-- [ ] Proof-of-Stake consensus (alternative)
+- [ ] Improved consensus algorithms (Proof-of-Stake)
 - [ ] Smart contract engine (Lua/WASM)
 - [ ] CLI management tool
-- [ ] Mobile app (React Native)
-- [ ] Block pruning optimization
 - [ ] Merkle tree implementation
+- [ ] Block pruning optimization
 - [ ] Light client support
 - [ ] Docker orchestration
 - [ ] Comprehensive test suite
@@ -394,17 +346,24 @@ curl http://localhost:8080/api/blockchain
 
 ## 🧪 Testing
 
+Run the automated verification script:
+
 ```bash
-# Run backend tests
-cd backend
+chmod +x verify_chain.sh
+./verify_chain.sh
+```
+
+This script tests:
+- Wallet creation
+- Mining with rewards
+- Transaction creation and signing
+- Balance calculations
+- Multi-node P2P synchronization
+
+Run individual tests:
+```bash
 go test ./... -v
-
-# Run with coverage
 go test ./... -cover
-
-# Frontend tests
-cd frontend
-npm run test
 ```
 
 ---

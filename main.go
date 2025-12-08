@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/Vishal-2029/internal"
@@ -9,16 +10,21 @@ import (
 )
 
 func main() {
-	db, err := pkg.NewBoltDB("chaingo.db")
+	apiPort := flag.String("api", "8080", "API Port")
+	p2pPort := flag.String("p2p", "9000", "P2P Port")
+	dbFile := flag.String("db", "chaingo.db", "Database file")
+	flag.Parse()
+
+	db, err := pkg.NewBoltDB(*dbFile)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
-	fmt.Println("Using persistent BoltDB storage: chaingo.db")
+	fmt.Printf("Using persistent BoltDB storage: %s\n", *dbFile)
 
 	// Create and set node for networking features
-	node := network.NewNode(":9000")
+	node := network.NewNode(":" + *p2pPort)
 	internal.SetNode(node)
 
 	// NEW: Set database for wallet persistence
@@ -28,5 +34,5 @@ func main() {
 		node.Start()
 	}()
 
-	internal.StartServer(db)
+	internal.StartServer(db, *apiPort)
 }

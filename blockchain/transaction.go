@@ -1,16 +1,19 @@
 package blockchain
 
 import (
+	"bytes"
 	"crypto/sha256"
+	"encoding/gob"
 	"strconv"
 )
 
 type Transaction struct {
-	From      string
-	To        string
-	Amount    int
-	R, S      string
-	PublicKey []byte
+	From      string `json:"from"`
+	To        string `json:"to"`
+	Amount    int    `json:"amount"`
+	R         string `json:"r"`
+	S         string `json:"s"`
+	PublicKey []byte `json:"publicKey"`
 }
 
 func (tx *Transaction) Hash() []byte {
@@ -34,4 +37,24 @@ func (tx *Transaction) Verify() bool {
 // Helper function to convert transaction to string
 func (tx *Transaction) String() string {
 	return tx.From + "->" + tx.To + ":" + strconv.Itoa(tx.Amount)
+}
+
+func (tx *Transaction) Serialize() []byte {
+	var encoded bytes.Buffer
+	enc := gob.NewEncoder(&encoded)
+	err := enc.Encode(tx)
+	if err != nil {
+		panic(err)
+	}
+	return encoded.Bytes()
+}
+
+func DeserializeTransaction(data []byte) *Transaction {
+	var tx Transaction
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+	err := decoder.Decode(&tx)
+	if err != nil {
+		panic(err)
+	}
+	return &tx
 }

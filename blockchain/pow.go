@@ -25,9 +25,17 @@ func NewProofOfWork(b *Block) *ProofOfWork {
 func (pow *ProofOfWork) prepareData(nonce int) []byte {
 	timestampBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(timestampBytes, uint64(pow.block.Timestamp))
+
+	// Hash all transactions to include in the block data
+	txHashes := [][]byte{}
+	for _, tx := range pow.block.Transactions {
+		txHashes = append(txHashes, tx.Hash())
+	}
+	txHash := sha256.Sum256(bytes.Join(txHashes, []byte{}))
+
 	data := bytes.Join([][]byte{
 		timestampBytes,
-		bytes.Join(stringArrayToBytes(pow.block.Transactions), []byte{}),
+		txHash[:],
 		pow.block.PrevHash,
 		IntToHex(int64(nonce)),
 	}, []byte{})
@@ -60,5 +68,3 @@ func (pow *ProofOfWork) Validate() bool {
 	hashInt.SetBytes(hash[:])
 	return hashInt.Cmp(pow.target) == -1
 }
-
-

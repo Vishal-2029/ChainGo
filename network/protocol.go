@@ -3,7 +3,15 @@ package network
 import (
 	"bytes"
 	"encoding/gob"
+
+	"github.com/Vishal-2029/blockchain"
 )
+
+func init() {
+	gob.Register(blockchain.Block{})
+	gob.Register(blockchain.Transaction{})
+	gob.Register([]*blockchain.Block{})
+}
 
 type Message struct {
 	Type string      // "BLOCK", "TRANSACTION", "CHAIN_REQUEST", "CHAIN_RESPONSE"

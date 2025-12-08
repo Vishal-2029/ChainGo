@@ -16,12 +16,16 @@ type Blockchain struct {
 
 func NewBlockchain(db *pkg.BoltDB) *Blockchain {
 	bc := &Blockchain{DB: db}
-	
+
 	// Try to load existing chain first
 	err := bc.LoadChain()
-	if err != nil {
-		log.Println("No existing chain found, creating genesis block...")
-		genesis := NewBlock([]string{"Genesis Block"}, []byte{})
+	if err != nil || len(bc.Block) == 0 {
+		if err != nil {
+			log.Println("Error loading chain:", err)
+		}
+		log.Println("No existing chain found or chain empty, creating genesis block...")
+		genesisTx := &Transaction{From: "Genesis", To: "Genesis", Amount: 0}
+		genesis := NewBlock([]*Transaction{genesisTx}, []byte{})
 		bc.Block = append(bc.Block, genesis)
 
 		if err := bc.SaveBlock(genesis); err != nil {
@@ -30,11 +34,11 @@ func NewBlockchain(db *pkg.BoltDB) *Blockchain {
 	} else {
 		log.Printf("Loaded existing chain with %d blocks\n", len(bc.Block))
 	}
-	
+
 	return bc
 }
 
-func (bc *Blockchain) AddBlock(transactions []string) {
+func (bc *Blockchain) AddBlock(transactions []*Transaction) {
 	prevBlock := bc.Block[len(bc.Block)-1]
 	newBlock := NewBlock(transactions, prevBlock.Hash)
 	bc.Block = append(bc.Block, newBlock)
@@ -54,7 +58,7 @@ func (bc *Blockchain) LoadChain() error {
 		if b == nil {
 			return fmt.Errorf("bucket not found")
 		}
-		
+
 		return b.ForEach(func(k, v []byte) error {
 			block := Deserialize(v)
 			bc.Block = append(bc.Block, block)
