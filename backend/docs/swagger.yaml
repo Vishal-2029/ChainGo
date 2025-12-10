@@ -1,0 +1,17 @@
+basePath: /api
+host: localhost:8080
+info:
+  contact:
+    email: vishal@chaingo.com
+    name: API Support
+  description: A complete blockchain implementation in Go with REST API
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: ChainGo Blockchain API
+  version: "1.0"
+paths: {}
+schemes:
+- http
+swagger: "2.0"
