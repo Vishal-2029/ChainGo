@@ -5,6 +5,7 @@ import Mining from '../views/Mining.vue'
 import BlockchainExplorer from '../views/BlockchainExplorer.vue'
 import Transactions from '../views/Transactions.vue'
 import Network from '../views/Network.vue'
+import Admin from '../views/Admin.vue'
 
 const router = createRouter({
     history: createWebHistory(),
@@ -38,6 +39,11 @@ const router = createRouter({
             path: '/network',
             name: 'Network',
             component: Network
+        },
+        {
+            path: '/admin',
+            name: 'Admin',
+            component: Admin
         }
     ]
 })

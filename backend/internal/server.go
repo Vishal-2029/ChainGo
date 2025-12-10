@@ -30,6 +30,7 @@ func StartServer(db *pkg.BoltDB, port string) {
 	// Wallet routes
 	api.Post("/wallet/create", CreateWalletHandler)
 	api.Get("/wallet/balance/:address", GetWalletBalanceHandler)
+	api.Get("/wallet/all", GetAllWalletsHandler)
 
 	// Transaction routes
 	api.Post("/transaction/create", CreateTransactionHandler)

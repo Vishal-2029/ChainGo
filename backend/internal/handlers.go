@@ -44,15 +44,24 @@ func SetDatabase(database *pkg.BoltDB) {
 
 func loadWalletsFromDB() {
 	walletsData, err := db.GetAllWallets()
-	if err != nil {
+	if err != nil || len(walletsData) == 0 {
 		logInfo("DB_LOAD", "No existing wallets found in database")
 		return
 	}
 
-	for address, walletData := range walletsData {
-		wallet, err := blockchain.DeserializeWallet(walletData)
+	for _, walletMap := range walletsData {
+		address, ok := walletMap["address"].(string)
+		if !ok {
+			continue
+		}
+
+		// Get the actual wallet bytes and try to load
+		walletBytes, err := db.GetWallet(address)
 		if err == nil {
-			wallets[address] = wallet
+			wallet, err := blockchain.DeserializeWallet(walletBytes)
+			if err == nil {
+				wallets[address] = wallet
+			}
 		}
 	}
 	logInfo("DB_LOAD", fmt.Sprintf("Loaded %d wallets from database", len(wallets)))
@@ -109,6 +118,50 @@ func GetWalletBalanceHandler(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"address": address,
 		"balance": balance,
+	})
+}
+
+// GetAllWalletsHandler returns all wallets from database
+func GetAllWalletsHandler(c *fiber.Ctx) error {
+	if db == nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Database not initialized",
+		})
+	}
+
+	walletsData, err := db.GetAllWallets()
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Failed to retrieve wallets",
+		})
+	}
+
+	// Convert wallet data to readable format
+	var walletList []fiber.Map
+	for _, walletMap := range walletsData {
+		// Extract wallet details from stored data
+		address, _ := walletMap["address"].(string)
+
+		// Get wallet from memory if available for full details
+		if wallet, exists := wallets[address]; exists {
+			walletList = append(walletList, fiber.Map{
+				"address":    address,
+				"publicKey":  hex.EncodeToString(wallet.PublicKey),
+				"privateKey": wallet.PrivateKeyHex(),
+			})
+		} else {
+			// Wallet not in memory, show limited info
+			walletList = append(walletList, fiber.Map{
+				"address":    address,
+				"publicKey":  "Available after server restart",
+				"privateKey": "Not available (create wallet again to see keys)",
+			})
+		}
+	}
+
+	return c.JSON(fiber.Map{
+		"count":   len(walletList),
+		"wallets": walletList,
 	})
 }
 

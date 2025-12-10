@@ -22,6 +22,9 @@
             <router-link to="/network" class="flex items-center px-3 py-2 text-white hover:bg-blue-500/20 rounded-lg transition">
               🌐 Network
             </router-link>
+            <router-link to="/admin" class="flex items-center px-3 py-2 text-white hover:bg-blue-500/20 rounded-lg transition">
+              🔐 Admin
+            </router-link>
           </div>
           <div class="flex items-center">
             <span class="text-green-400 font-bold">⛓️ ChainGo</span>

@@ -64,19 +64,26 @@ func (b *BoltDB) GetWallet(address string) ([]byte, error) {
 	return val, err
 }
 
-func (b *BoltDB) GetAllWallets() (map[string][]byte, error) {
-	wallets := make(map[string][]byte)
+// GetAllWallets retrieves all wallets from database as JSON-compatible maps
+func (b *BoltDB) GetAllWallets() ([]map[string]interface{}, error) {
+	var wallets []map[string]interface{}
+
 	err := b.DB.View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(walletsBucket)
 		if bucket == nil {
-			return errors.New("wallets bucket missing")
+			return nil // No wallets bucket means no wallets
 		}
 
 		return bucket.ForEach(func(k, v []byte) error {
-			wallets[string(k)] = append([]byte{}, v...)
+			// Try to deserialize as wallet data
+			wallets = append(wallets, map[string]interface{}{
+				"address": string(k),
+				"data":    string(v),
+			})
 			return nil
 		})
 	})
+
 	return wallets, err
 }
 
