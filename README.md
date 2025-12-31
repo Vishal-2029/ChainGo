@@ -410,36 +410,23 @@ We love contributions! Here's how you can help:
 
 ## 📚 Learning Resources
 
-- [Blockchain Basics](docs/BLOCKCHAIN_BASICS.md)
-- [Go Concurrency Patterns](docs/CONCURRENCY.md)
-- [Cryptography in Blockchain](docs/CRYPTOGRAPHY.md)
-- [API Documentation](docs/API.md)
-
----
-
-## 🌟 Showcase
-
-### Dashboard Preview
-*[Add screenshot of Vue.js dashboard]*
-
-### Mining in Action
-*[Add GIF of mining process]*
-
-### Block Explorer
-*[Add screenshot of block explorer]*
+- [Blockchain Basics](https://www.geeksforgeeks.org/software-engineering/blockchain/)
+- [Go Concurrency Patterns](https://go.dev/talks/2012/concurrency.slide#1)
+- [Cryptography in Blockchain](https://www.geeksforgeeks.org/computer-networks/cryptography-and-its-types/)
+- [API Documentation](https://github.com/Vishal-2029/ChainGo/blob/main/API_GUIDE.md)
 
 ---
 
 ## 🧑‍💻 Author
 
-**Vish**  
+**Vishal**  
 Backend & Blockchain Developer  
 📍 Specialized in Go + Blockchain + Distributed Systems
 
 - 🌐 Website: [your-website.com]
-- 💼 LinkedIn: [your-linkedin]
-- 🐙 GitHub: [@yourusername](https://github.com/yourusername)
-- 📧 Email: your.email@example.com
+- 💼 LinkedIn: [Vishal Sabhadiya](https://www.linkedin.com/in/vishal-sabhadiya-4916472a7/)
+- 🐙 GitHub: [@Vishal-2029](https://github.com/Vishal-2029)
+- 📧 Email: sabhadiyavishal02@gmail.com
 
 ---
 
