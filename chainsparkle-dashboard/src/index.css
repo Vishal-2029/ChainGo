@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+@layer base {
+  :root {
+    /* Primary Colors - Bitcoin/Ethereum Inspired */
+    --primary-gold: 36 96% 54%;
+    --primary-ethereum: 227 77% 65%;
+    
+    /* Background Colors - Deep Space */
+    --background: 230 62% 10%;
+    --background-secondary: 230 50% 16%;
+    --background-tertiary: 228 36% 20%;
+    --background-elevated: 228 30% 25%;
+    
+    /* Foreground/Text */
+    --foreground: 210 40% 98%;
+    --foreground-secondary: 220 9% 63%;
+    --foreground-muted: 220 9% 46%;
+    
+    /* Card with glass effect */
+    --card: 230 50% 16%;
+    --card-foreground: 210 40% 98%;
+    
+    /* Popover */
+    --popover: 230 50% 16%;
+    --popover-foreground: 210 40% 98%;
+    
+    /* Primary - Gold gradient base */
+    --primary: 36 96% 54%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary */
+    --secondary: 227 77% 65%;
+    --secondary-foreground: 0 0% 100%;
+    
+    /* Muted */
+    --muted: 228 36% 20%;
+    --muted-foreground: 220 9% 63%;
+    
+    /* Accent */
+    --accent: 228 36% 20%;
+    --accent-foreground: 210 40% 98%;
+    
+    /* Status Colors */
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --mining: 263 70% 66%;
+    --mining-foreground: 0 0% 100%;
+    
+    /* Border & Input */
+    --border: 228 30% 25%;
+    --input: 228 36% 20%;
+    --ring: 36 96% 54%;
+    
+    /* Glass Effect */
+    --glass-bg: 0 0% 100% / 0.05;
+    --glass-border: 0 0% 100% / 0.1;
+    
+    --radius: 0.75rem;
+    
+    /* Sidebar */
+    --sidebar-background: 230 50% 12%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 36 96% 54%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 228 36% 20%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 228 30% 20%;
+    --sidebar-ring: 36 96% 54%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  
+  .font-mono {
+    font-family: 'Space Mono', 'Courier New', monospace;
+  }
+}
+
+@layer utilities {
+  /* Gradient utilities */
+  .gradient-gold-blue {
+    background: linear-gradient(135deg, hsl(36 96% 54%) 0%, hsl(227 77% 65%) 100%);
+  }
+  
+  .gradient-gold-blue-text {
+    background: linear-gradient(135deg, hsl(36 96% 54%) 0%, hsl(227 77% 65%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Glass morphism */
+  .glass {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--glass-border));
+  }
+  
+  .glass-hover:hover {
+    background: hsl(0 0% 100% / 0.08);
+    border-color: hsl(0 0% 100% / 0.2);
+  }
+  
+  /* Glow effects */
+  .glow-gold {
+    box-shadow: 0 0 30px hsl(36 96% 54% / 0.5);
+  }
+  
+  .glow-blue {
+    box-shadow: 0 0 30px hsl(227 77% 65% / 0.5);
+  }
+  
+  .glow-success {
+    box-shadow: 0 0 20px hsl(160 84% 39% / 0.4);
+  }
+  
+  .glow-mining {
+    box-shadow: 0 0 25px hsl(263 70% 66% / 0.5);
+  }
+  
+  /* Text glow */
+  .text-glow-gold {
+    text-shadow: 0 0 20px hsl(36 96% 54% / 0.6);
+  }
+  
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background-secondary));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--background-elevated));
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--foreground-muted));
+  }
+}
