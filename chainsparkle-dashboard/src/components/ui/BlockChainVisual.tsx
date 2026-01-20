@@ -33,12 +33,12 @@ export function BlockChainVisual({ blocks }: BlockChainVisualProps) {
               whileHover={{ scale: 1.05 }}
             >
               <div className="text-center">
-                <p className="text-xs text-foreground-muted mb-1">Block</p>
-                <p className="text-lg font-bold gradient-gold-blue-text">#{block.height}</p>
-                <p className="text-xs font-mono text-foreground-secondary mt-2 truncate max-w-[120px]">
+                <p className="text-xs text-white/70 mb-1">Block</p>
+                <p className="text-lg font-bold text-white">#{block.height}</p>
+                <p className="text-xs font-mono text-white/80 mt-2 truncate max-w-[120px]">
                   {block.hash.slice(0, 8)}...
                 </p>
-                <div className="flex items-center justify-center gap-2 mt-2 text-xs text-foreground-muted">
+                <div className="flex items-center justify-center gap-2 mt-2 text-xs text-white/60">
                   <span>{block.txCount} txs</span>
                   <span>•</span>
                   <span>{block.time}</span>

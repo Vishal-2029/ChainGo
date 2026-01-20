@@ -320,6 +320,38 @@ func ValidateHandler(c *fiber.Ctx) error {
 	})
 }
 
+func DeleteBlockHandler(c *fiber.Ctx) error {
+	mu.Lock()
+	defer mu.Unlock()
+
+	index, err := strconv.Atoi(c.Params("index"))
+	if err != nil || index < 0 || index >= len(chain.Block) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid block index",
+		})
+	}
+
+	// Cannot delete genesis block
+	if index == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Cannot delete genesis block",
+		})
+	}
+
+	// Delete this block and all subsequent blocks
+	deletedCount := len(chain.Block) - index
+	chain.Block = chain.Block[:index]
+
+	logSuccess("BLOCK_DELETE", fmt.Sprintf("Deleted %d blocks starting from index %d", deletedCount, index))
+
+	return c.JSON(fiber.Map{
+		"message":      "Blocks deleted successfully",
+		"deletedFrom":  index,
+		"deletedCount": deletedCount,
+		"newLength":    len(chain.Block),
+	})
+}
+
 // ========== MINING HANDLER ==========
 
 func MineHandler(c *fiber.Ctx) error {

@@ -1,37 +1,119 @@
 import { motion } from "framer-motion";
-import { Blocks, ArrowRightLeft, Users, Pickaxe, TrendingUp, Clock, Hash } from "lucide-react";
+import { Blocks, ArrowRightLeft, Users, Pickaxe, TrendingUp, Clock, Hash, RefreshCw } from "lucide-react";
 import { StatCard } from "@/components/ui/StatCard";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { BlockChainVisual } from "@/components/ui/BlockChainVisual";
 import { ActivityFeed } from "@/components/ui/ActivityFeed";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { api, Block } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
-// Mock data for demonstration
-const mockBlocks = [
-  { height: 125, hash: "0000ae3b9c7d1e5f4a2b8c9d0e1f2a3b", txCount: 5, time: "2m ago" },
-  { height: 124, hash: "0000def456789abc123def456789abcd", txCount: 3, time: "4m ago" },
-  { height: 123, hash: "0000123abc456def789012345abcdef0", txCount: 8, time: "7m ago" },
-  { height: 122, hash: "0000fedcba9876543210fedcba987654", txCount: 2, time: "10m ago" },
-  { height: 121, hash: "0000abcdef123456789abcdef1234567", txCount: 6, time: "12m ago" },
-];
-
-const mockActivities = [
-  { id: "1", type: "mining" as const, message: "Block #125 mined successfully", details: "Reward: 50 ChainGo", time: "Just now" },
-  { id: "2", type: "transaction" as const, message: "New transaction received", details: "0x4a2b...8c9d → 0x1e5f...3b4c", time: "1m ago" },
-  { id: "3", type: "peer_connect" as const, message: "New peer connected", details: "192.168.1.105:9001", time: "2m ago" },
-  { id: "4", type: "transaction" as const, message: "Transaction confirmed", details: "0xdef4...89ab → 0x5678...cdef", time: "3m ago" },
-  { id: "5", type: "mining" as const, message: "Block #124 mined", details: "Reward: 50 ChainGo", time: "4m ago" },
-  { id: "6", type: "peer_disconnect" as const, message: "Peer disconnected", details: "192.168.1.102:9001", time: "5m ago" },
-];
-
-const mockRecentBlocks = [
-  { height: 125, hash: "0000ae3b9c7d1e5f4a2b8c9d0e1f2a3b", txCount: 5, miner: "abc123...def", time: "2 mins ago" },
-  { height: 124, hash: "0000def456789abc123def456789abcd", txCount: 3, miner: "xyz789...ghi", time: "4 mins ago" },
-  { height: 123, hash: "0000123abc456def789012345abcdef0", txCount: 8, miner: "abc123...def", time: "7 mins ago" },
-];
+interface Activity {
+  id: string;
+  type: "mining" | "transaction" | "peer_connect" | "peer_disconnect";
+  message: string;
+  details: string;
+  time: string;
+}
 
 export function Dashboard() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    blocks: 0,
+    pendingTransactions: 0,
+    totalTransactions: 0,
+    latestBlockHash: "",
+  });
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [recentBlocks, setRecentBlocks] = useState<Block[]>([]);
+  const [peers, setPeers] = useState<string[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const [chainData, statsData, peersData, pendingData] = await Promise.all([
+        api.getChain(),
+        api.getChainStats(),
+        api.listPeers(),
+        api.getPendingTransactions(),
+      ]);
+
+      setStats(statsData);
+      setBlocks(chainData.chain);
+      setRecentBlocks(chainData.chain.slice(-3).reverse());
+      setPeers(peersData.peers || []);
+
+      // Generate activities from recent data
+      const newActivities: Activity[] = [];
+      if (chainData.chain.length > 0) {
+        const latestBlock = chainData.chain[chainData.chain.length - 1];
+        newActivities.push({
+          id: "1",
+          type: "mining",
+          message: `Block #${latestBlock.index} mined`,
+          details: `${latestBlock.transactions?.length || 0} transactions`,
+          time: "Just now",
+        });
+      }
+
+      if (pendingData.count > 0) {
+        newActivities.push({
+          id: "2",
+          type: "transaction",
+          message: `${pendingData.count} pending transactions`,
+          details: "In mempool",
+          time: "Now",
+        });
+      }
+
+      if (peersData.peers?.length > 0) {
+        newActivities.push({
+          id: "3",
+          type: "peer_connect",
+          message: `${peersData.peers.length} peers connected`,
+          details: peersData.peers[0] || "Network active",
+          time: "Active",
+        });
+      }
+
+      setActivities(newActivities);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to blockchain. Make sure the backend is running.",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  }, [fetchData]);
+
+  const formatTimeAgo = (timestamp: number) => {
+    const seconds = Math.floor((Date.now() / 1000) - timestamp);
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    return `${Math.floor(seconds / 3600)}h ago`;
+  };
+
+  const visualBlocks = blocks.slice(-5).map((block) => ({
+    height: block.index,
+    hash: block.hash,
+    txCount: block.transactions?.length || 0,
+    time: formatTimeAgo(block.timestamp),
+  }));
+
   return (
     <div className="space-y-8">
       {/* Hero Section */}
@@ -46,27 +128,43 @@ export function Dashboard() {
             <span className="gradient-gold-blue-text">ChainGo</span> Blockchain
           </h1>
           <p className="text-foreground-secondary text-lg max-w-2xl mx-auto">
-            Real-time blockchain monitoring, transaction processing, and mining control. 
+            Real-time blockchain monitoring, transaction processing, and mining control.
             Your gateway to the decentralized future.
           </p>
         </motion.div>
 
         {/* Animated Chain Visualization */}
-        <BlockChainVisual blocks={mockBlocks} />
+        {visualBlocks.length > 0 ? (
+          <BlockChainVisual blocks={visualBlocks} />
+        ) : (
+          <div className="text-center py-8 text-foreground-muted">
+            {loading ? "Loading blockchain..." : "No blocks yet. Start mining!"}
+          </div>
+        )}
 
         {/* Mining CTA */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex justify-center mt-6"
+          className="flex justify-center gap-4 mt-6"
         >
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             className="gradient-gold-blue text-primary-foreground font-semibold text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-pulse-glow"
+            onClick={() => navigate("/mining")}
           >
             <Pickaxe className="w-5 h-5 mr-2" />
             Start Mining
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            className="border-primary text-primary font-semibold text-lg px-8 py-6 rounded-full"
+            onClick={fetchData}
+          >
+            <RefreshCw className="w-5 h-5 mr-2" />
+            Refresh
           </Button>
         </motion.div>
       </section>
@@ -75,16 +173,16 @@ export function Dashboard() {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total Blocks"
-          value="125"
-          subtitle="Last mined 2m ago"
+          value={stats.blocks.toString()}
+          subtitle={recentBlocks[0] ? `Last mined ${formatTimeAgo(recentBlocks[0].timestamp)}` : "No blocks yet"}
           icon={Blocks}
-          trend={{ value: "+3 today", positive: true }}
+          trend={{ value: `${stats.blocks} total`, positive: true }}
           glow="gold"
           delay={0}
         />
         <StatCard
           title="Pending TXs"
-          value="8"
+          value={stats.pendingTransactions.toString()}
           subtitle="In mempool"
           icon={ArrowRightLeft}
           glow="blue"
@@ -92,17 +190,17 @@ export function Dashboard() {
         />
         <StatCard
           title="Network Peers"
-          value="5"
+          value={peers.length.toString()}
           subtitle="Active connections"
           icon={Users}
-          trend={{ value: "+2 this hour", positive: true }}
+          trend={{ value: peers.length > 0 ? "Connected" : "No peers", positive: peers.length > 0 }}
           glow="success"
           delay={0.2}
         />
         <StatCard
-          title="Hash Rate"
-          value="1,234 H/s"
-          subtitle="Current mining power"
+          title="Total TXs"
+          value={stats.totalTransactions.toString()}
+          subtitle="All transactions"
           icon={TrendingUp}
           glow="mining"
           delay={0.3}
@@ -123,48 +221,59 @@ export function Dashboard() {
                 <Blocks className="w-5 h-5 text-primary" />
                 Latest Blocks
               </h2>
-              <Button variant="ghost" size="sm" className="text-foreground-secondary hover:text-foreground">
-                View All →
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-foreground-secondary hover:text-foreground"
+                onClick={() => navigate("/blocks")}
+              >
+                View All
               </Button>
             </div>
-            
+
             <div className="space-y-3">
-              {mockRecentBlocks.map((block, index) => (
-                <motion.div
-                  key={block.height}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
-                >
-                  <GlassCard className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-xl bg-primary/10">
-                        <Hash className="w-5 h-5 text-primary" />
+              {recentBlocks.length > 0 ? (
+                recentBlocks.map((block, index) => (
+                  <motion.div
+                    key={block.index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
+                  >
+                    <GlassCard className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 rounded-xl bg-primary/10">
+                          <Hash className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">
+                            Block <span className="gradient-gold-blue-text">#{block.index}</span>
+                          </p>
+                          <p className="text-sm font-mono text-foreground-muted">
+                            {block.hash.slice(0, 16)}...
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-foreground">
-                          Block <span className="gradient-gold-blue-text">#{block.height}</span>
-                        </p>
-                        <p className="text-sm font-mono text-foreground-muted">
-                          {block.hash.slice(0, 16)}...
-                        </p>
+
+                      <div className="flex items-center gap-6 text-sm">
+                        <div className="flex items-center gap-2">
+                          <ArrowRightLeft className="w-4 h-4 text-foreground-muted" />
+                          <span className="text-foreground-secondary">{block.transactions?.length || 0} txs</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-foreground-muted" />
+                          <span className="text-foreground-secondary">{formatTimeAgo(block.timestamp)}</span>
+                        </div>
+                        <StatusBadge status="confirmed" />
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-6 text-sm">
-                      <div className="flex items-center gap-2">
-                        <ArrowRightLeft className="w-4 h-4 text-foreground-muted" />
-                        <span className="text-foreground-secondary">{block.txCount} txs</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-foreground-muted" />
-                        <span className="text-foreground-secondary">{block.time}</span>
-                      </div>
-                      <StatusBadge status="confirmed" />
-                    </div>
-                  </GlassCard>
-                </motion.div>
-              ))}
+                    </GlassCard>
+                  </motion.div>
+                ))
+              ) : (
+                <GlassCard className="text-center py-8 text-foreground-muted">
+                  {loading ? "Loading blocks..." : "No blocks yet. Start mining to create the first block!"}
+                </GlassCard>
+              )}
             </div>
           </motion.div>
         </div>
@@ -180,7 +289,9 @@ export function Dashboard() {
               <TrendingUp className="w-5 h-5 text-secondary" />
               Live Activity
             </h2>
-            <ActivityFeed activities={mockActivities} />
+            <ActivityFeed activities={activities.length > 0 ? activities : [
+              { id: "1", type: "mining", message: "Waiting for activity...", details: "Start mining to see updates", time: "Now" }
+            ]} />
           </motion.div>
         </div>
       </section>

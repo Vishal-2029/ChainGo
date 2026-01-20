@@ -33,14 +33,18 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative">
-              <div className="w-10 h-10 rounded-xl gradient-gold-blue flex items-center justify-center">
-                <span className="text-xl">⛓️</span>
+              <div className="w-10 h-10 rounded-xl gradient-gold-blue flex items-center justify-center shadow-lg">
+                <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
               <div className="absolute inset-0 rounded-xl gradient-gold-blue opacity-50 blur-lg group-hover:opacity-80 transition-opacity" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">ChainGo</h1>
-              <p className="text-xs text-foreground-muted -mt-0.5">Blockchain Explorer</p>
+              <h1 className="text-xl font-bold gradient-gold-blue-text">ChainGo</h1>
+              <p className="text-xs text-foreground-secondary -mt-0.5">Blockchain Explorer</p>
             </div>
           </Link>
 

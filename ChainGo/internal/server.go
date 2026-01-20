@@ -39,6 +39,7 @@ func StartServer(db *pkg.BoltDB, port string) {
 	api.Get("/chain", GetChainHandler)
 	api.Get("/chain/:index", GetBlockByIndexHandler)
 	api.Get("/block/latest", GetLatestBlockHandler)
+	api.Delete("/block/delete/:index", DeleteBlockHandler)
 	api.Get("/validate", ValidateHandler)
 
 	// Mining routes
