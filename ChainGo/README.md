@@ -193,8 +193,8 @@ graph LR
 #### 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/chaingo.git
-cd chaingo
+git clone https://github.com/Vishal-2029/Chaingo.git
+cd ChainGo
 ```
 
 #### 2️⃣ Install Dependencies
@@ -212,14 +212,14 @@ go build -o chaingo_backend main.go
 #### 4️⃣ Run the Blockchain Node
 
 ```bash
-./chaingo_backend
+./Chaingo
 ```
 
 The backend server will start on `http://localhost:8080` (API) and `:9000` (P2P)
 
 You can customize ports:
 ```bash
-./chaingo_backend -api 8080 -p2p 9000 -db chaingo.db
+./Chaingo -api 8080 -p2p 9000 -db chaingo.db
 ```
 
 ---
@@ -278,12 +278,12 @@ curl http://localhost:8080/api/chain
 
 **Terminal 1 (Node 1):**
 ```bash
-./chaingo_backend -api 8080 -p2p 9000 -db node1.db
+./Chaingo -api 8080 -p2p 9000 -db node1.db
 ```
 
 **Terminal 2 (Node 2):**
 ```bash
-./chaingo_backend -api 8081 -p2p 9001 -db node2.db
+./Chaingo -api 8081 -p2p 9001 -db node2.db
 ```
 
 **Connect Nodes:**

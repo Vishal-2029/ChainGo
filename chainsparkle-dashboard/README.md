@@ -27,7 +27,7 @@ Follow these steps:
 git clone <https://github.com/Vishal-2029/Chaingo.git>
 
 # Step 2: Navigate to the project directory.
-cd <Chaingo>
+cd <chainsparkle-dashboard>
 
 # Step 3: Install the necessary dependencies.
 npm i
